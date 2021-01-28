@@ -380,6 +380,10 @@ spec:
   {{- if not .Values.persistence.enabled }}
         - name: datadir
           emptyDir: {}
+  {{- else if .Values.persistence.hostPath }}
+        - name: datadir
+          hostPath: {{ .Values.persistence.hostPath }}
+          type: {{ default "Directory" .Values.persistence.hostPathType }}
   {{- else if .Values.persistence.existingClaim }}
         - name: datadir
           persistentVolumeClaim:
