@@ -380,10 +380,10 @@ spec:
               path: mongodb-ca-key
               mode: 511
         {{- end }}
-  {{- if not .Values.persistence.enabled }}
+  {{- if and (not .Values.persistence.enabled) (not .Values.persistence.hostPath) }}
         - name: datadir
           emptyDir: {}
-  {{- else if .Values.persistence.hostPath }}
+  {{- else if and (not .Values.persistence.enabled) .Values.persistence.hostPath }}
         - name: datadir
           hostPath:
             path: {{ .Values.persistence.hostPath }}

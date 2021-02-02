@@ -306,9 +306,14 @@ spec:
         - name: config
           configMap:
             name: {{ template "redis.fullname" . }}
-        {{- if not .Values.master.persistence.enabled }}
-        - name: "redis-data"
+        {{- if and (not .Values.master.persistence.enabled) (not .Values.master.persistence.hostPath) }}
+        - name: redis-data
           emptyDir: {}
+        {{- else if and (not .Values.master.persistence.enabled) .Values.master.persistence.hostPath }}
+        - name: redis-data
+          hostPath:
+            path: {{ .Values.master.persistence.hostPath }}
+            type: {{ default "Directory" .Values.master.persistence.hostPathType }}
         {{- else }}
         {{- if .Values.persistence.existingClaim }}
         - name: "redis-data"

@@ -335,9 +335,14 @@ spec:
             secretName: {{ required "A secret containing the certificates for the TLS traffic is required when TLS in enabled" .Values.tls.certificatesSecret }}
             defaultMode: 256
     {{- end }}
-    {{- if not .Values.slave.persistence.enabled }}
+    {{- if and (not .Values.slave.persistence.enabled) (not .Values.slave.persistence.hostPath) }}
         - name: redis-data
           emptyDir: {}
+    {{- else if and (not .Values.slave.persistence.enabled) .Values.slave.persistence.hostPath }}
+        - name: redis-data
+          hostPath:
+            path: {{ .Values.slave.persistence.hostPath }}
+            type: {{ default "Directory" .Values.slave.persistence.hostPathType }}
     {{- else }}
   volumeClaimTemplates:
     - metadata:
